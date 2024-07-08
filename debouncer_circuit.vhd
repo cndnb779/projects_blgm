@@ -19,6 +19,7 @@
 ----------------------------------------------------------------------------------
 
 
+
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 
@@ -39,7 +40,7 @@ entity debouncer_circuit is
 end debouncer_circuit;
 
 architecture Behavioral of debouncer_circuit is
-constant delay : integer := 35;
+constant delay : integer := 1_000_000;
 signal count : integer range 0 to delay:=0;
 signal debounced: std_logic:='0';
 signal stable: std_logic:='0';
@@ -47,7 +48,7 @@ signal passing : std_logic:='0';
 signal prev_debounced : std_logic:='0';
 --signal prev_stable: std_logic:='0';
 begin
-process(clk,reset)
+process(clk,reset, push_button)
 
 begin
 if reset = '1' then
@@ -57,9 +58,10 @@ if reset = '1' then
     passing <= '0';
     prev_debounced <='0';
 elsif rising_edge(clk) then
+    stable <= push_button;
     if push_button = stable then
         if count < delay then
-            count <= count+1;
+            count <= count+1; --10 ms
         else
             debounced <=  stable;--deb 0 --deb1
         end if;
@@ -76,3 +78,4 @@ end if;
 end process;       
 debounced_out<=passing;    
 end Behavioral;
+
