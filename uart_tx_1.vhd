@@ -91,38 +91,50 @@ case state is
                 bittimer <= 0;
                 n<=0;
                 state <= parity_stat;
+                if (b(0) = '1') then
+                    num_of_ones <= num_of_ones + 1;
+                end if;
                 --tx <='1'; stop statee geçince 1
             else
                 bittimer<= bittimer + 1;  
                 --tx <= b(0);  
             end if;
-        else    
+        else --sorun olablir   
             if (bittimer = lim - 1) then
                 b(6 downto 0)<= b(7 downto 1); --  shifted
                 b(7) <= b(0);
                 n <= n+ 1;
                 bittimer <= 0;
                 tx <= b(0);
-                if b(0) = '1' then--inout
-                    num_of_ones <= num_of_ones+ 1;
-                end if;    
+                if (b(0) = '1') then
+                    num_of_ones <= num_of_ones + 1;
+                end if;
+                    
             else
                 bittimer <= bittimer + 1;
                    
             end if;    
         end if; 
     when parity_stat=>
+    
         if (bittimer = lim - 1) then
             state<=stop_stat;
             bittimer <= 0;  
             tx <='1';
-        else
+            num_of_ones<=0;
+        
+--           if (num_of_ones mod 2 =0) then --even
+--                tx<='0';
+--            else
+--                tx<='1';
+--            end if; 
+        else    
+           bittimer<= bittimer + 1;
            if (num_of_ones mod 2 =0) then --even
                 tx<='0';
             else
                 tx<='1';
             end if; 
-           bittimer<= bittimer + 1;
         end if;
                   
               
