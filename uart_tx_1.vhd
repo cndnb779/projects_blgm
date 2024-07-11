@@ -54,7 +54,7 @@ signal state : states := idle_stat;
 signal b : std_logic_vector(7 downto 0);--bits to be shifted
 signal n : integer range 0 to 7:=0;--number of data bits counter
 signal bittimer : integer range 0 to stopbitlim:=0; --number of s ticks
-signal num_of_ones :integer range 1 to 8:=0;--num of ones for even parity
+signal num_of_ones :integer range 0 to 8:=0;--num of ones for even parity
 begin
 process(clk)
 begin
@@ -94,7 +94,7 @@ case state is
                 if (b(0) = '1') then
                     num_of_ones <= num_of_ones + 1;
                 end if;
-                --tx <='1'; stop statee geçince 1
+                --tx <='1'; stop statee geÃ§ince 1
             else
                 bittimer<= bittimer + 1;  
                 --tx <= b(0);  
