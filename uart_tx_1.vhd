@@ -58,6 +58,7 @@ signal num_of_ones :integer range 0 to 8:=0;--num of ones for even parity
 begin
 process(clk)
 begin
+if (rising_edge(clk)) then
 case state is
     when idle_stat =>
         tx<= '1';
@@ -89,12 +90,12 @@ case state is
         if ( n = 7) then --tum data geldi
             if (bittimer = lim-1) then
                 bittimer <= 0;
-                n<=0;
+                n<=0; --parity geçmeden sýfýrlandý
                 state <= parity_stat;
                 if (b(0) = '1') then
                     num_of_ones <= num_of_ones + 1;
                 end if;
-                --tx <='1'; stop statee geÃ§ince 1
+                --tx <='1'; stop statee geçince 1
             else
                 bittimer<= bittimer + 1;  
                 --tx <= b(0);  
@@ -129,7 +130,7 @@ case state is
 --                tx<='1';
 --            end if; 
         else    
-           bittimer<= bittimer + 1;
+           bittimer<= bittimer + 1;--bittimer artarken sadece toplam 1 sayýsý alýncak 
            if (num_of_ones mod 2 =0) then --even
                 tx<='0';
             else
@@ -150,6 +151,6 @@ case state is
             bittimer<= bittimer + 1; 
         end if;         
 end case;
-
+end if;
 end process;
 end Behavioral;
