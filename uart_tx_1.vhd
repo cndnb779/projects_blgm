@@ -33,7 +33,7 @@ use IEEE.NUMERIC_STD.ALL;
 
 entity uart_tx_1 is
     generic(
-    clk_freq : integer :=1_000_000;
+    clk_freq : integer :=100_000_000;
     
     baudrate : integer := 115_200;
     stop_bit : integer := 2);
@@ -90,12 +90,12 @@ case state is
         if ( n = 7) then --tum data geldi
             if (bittimer = lim-1) then
                 bittimer <= 0;
-                n<=0; --parity geçmeden sıfırlandı
+                n<=0; --parity geÃ§meden sÃ½fÃ½rlandÃ½
                 state <= parity_stat;
                 if (b(0) = '1') then
                     num_of_ones <= num_of_ones + 1;
                 end if;
-                --tx <='1'; stop statee geçince 1
+                --tx <='1'; stop statee geÃ§ince 1
             else
                 bittimer<= bittimer + 1;  
                 --tx <= b(0);  
@@ -130,7 +130,7 @@ case state is
 --                tx<='1';
 --            end if; 
         else    
-           bittimer<= bittimer + 1;--bittimer artarken sadece toplam 1 sayısı alıncak 
+           bittimer<= bittimer + 1;--bittimer artarken sadece toplam 1 sayÃ½sÃ½ alÃ½ncak 
            if (num_of_ones mod 2 =0) then --even
                 tx<='0';
             else
