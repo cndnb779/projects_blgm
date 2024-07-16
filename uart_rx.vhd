@@ -91,9 +91,6 @@ if (rising_edge(clk)) then
                     n<=n+1;
                     state<= data_stat;    
                 end if;    
---                b <= rx_in & (b(7 downto 1));--msb
---                bittimer<=0; 
-                
            else
                 bittimer<=bittimer+1;
             
@@ -102,8 +99,8 @@ if (rising_edge(clk)) then
         gelen_parity<= rx_in;
         if (bittimer = lim - 1) then --bittimer=15
             state<=stop_stat;
-            bittimer <= 0;  
---            gelen_parity<= rx_in;--deðere geri dönmek için
+            bittimer <= 0;
+            rx_data_out<= b;  
         else    
            bittimer<= bittimer + 1;
  
@@ -142,5 +139,5 @@ if (rising_edge(clk)) then
 end if;
 
 end process;
-rx_data_out<= b;  --
+--rx_data_out<= b;  --
 end Behavioral;
