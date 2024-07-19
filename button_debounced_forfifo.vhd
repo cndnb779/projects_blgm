@@ -35,7 +35,7 @@ use IEEE.STD_LOGIC_1164.ALL;
 entity debounced_button_forfifo is
     Port ( push_button : in STD_LOGIC;
            clk : in STD_LOGIC;
-           reset : in STD_LOGIC;
+--           reset : in STD_LOGIC;
            debounced_out : out STD_LOGIC);
 end debounced_button_forfifo;
 
@@ -48,16 +48,16 @@ signal passing : std_logic:='0';
 signal prev_debounced : std_logic:='0';
 --signal prev_stable: std_logic:='0';
 begin
-process(clk,reset, push_button)
+process(clk, push_button)
 
 begin
-if reset = '1' then
-    count <= 0;
-    debounced <='0';
-    stable<='0';
-    passing <= '0';
-    prev_debounced <='0';
-elsif rising_edge(clk) then
+--if reset = '1' then
+--    count <= 0;
+--    debounced <='0';
+--    stable<='0';
+--    passing <= '0';
+--    prev_debounced <='0';
+if rising_edge(clk) then
     stable <= push_button;
     if push_button = stable then
         if count < delay then
@@ -70,7 +70,7 @@ elsif rising_edge(clk) then
         stable <= push_button; --stable 1 st 0
         
      end if;
-     if (debounced = '1' and prev_debounced='0') then
+     if (debounced /= prev_debounced) then
         passing <= not passing;
      end if;
      prev_debounced <= debounced; --0  
