@@ -90,7 +90,7 @@ end component;
 --signal rx_in : STD_LOGIC ;  -- Receiver input signal
 signal rx_dout : STD_LOGIC_VECTOR(7 downto 0);  -- Data received by the receiver
 signal rx_done_tick : STD_LOGIC;  -- Receiver done tick signalsignal rx_dout: std_logic_vector(7 downto 0);
-signal tx_data_in: std_logic_vector(7 downto 0); --fifodan f veya e ascii kodu fifodan cýkan full ve empty ye gore
+signal tx_data_in: std_logic_vector(7 downto 0); --fifodan f veya e ascii kodu fifodan cÃ½kan full ve empty ye gore
 signal rx_donetick: std_logic;
 signal tx_donetick: std_logic;
 signal tx_start:std_logic;
