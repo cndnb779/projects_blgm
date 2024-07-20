@@ -102,7 +102,7 @@ end component;
 --signal rx_in : STD_LOGIC ;  -- Receiver input signal
 signal rx_dout : STD_LOGIC_VECTOR(7 downto 0);  -- Data received by the receiver
 signal rx_done_tick : STD_LOGIC;  -- Receiver done tick signalsignal rx_dout: std_logic_vector(7 downto 0);
-signal tx_data_in: std_logic_vector(7 downto 0); --fifodan f veya e ascii kodu fifodan cýkan full ve empty ye gore
+signal tx_data_in: std_logic_vector(7 downto 0); --fifodan f veya e ascii kodu fifodan cÃ½kan full ve empty ye gore
 signal rx_donetick1: std_logic;
 signal tx_donetick: std_logic;
 signal tx_start:std_logic;
@@ -134,20 +134,47 @@ u4: debounced_button_forfifo port map(push_button,clk,debounced_out);
 
 u5:ila_0  port map(clk,temp_rx,rx_donetick1,debounced_out, rx_dout);
 
-t_process:process (clk)
-begin
+--t_process:process (clk)
+--begin
  
-    if (empty='1') then
-             tx_data_in<=x"45";
-             tx_start<='1';
-    elsif(full='1') then
-             tx_data_in<= x"46";
-             tx_start<='1';
-    else 
-        tx_start<='0';         
-   end if;
+--    if (empty='1') then
+--             tx_data_in<=x"45";
+--             tx_start<='1';
+--    elsif(full='1') then
+ --            tx_data_in<= x"46";
+--             tx_start<='1';
+--    else 
+--        tx_start<='0';         
+--   end if;
 
- end process;
+-- end process;
 
 
-end Behavioral;
+--end Behavioral;
+	   t_process: process (clk, rst)
+begin
+    if rst = '1' then
+        tx_data_in <= (others => '0');
+        tx_start <= '0';
+    elsif rising_edge(clk) then
+        if empty = '1' then
+            tx_data_in <= x"45";
+            tx_start <= '1';
+        elsif full = '1' then
+            tx_data_in <= x"46";
+            tx_start <= '1';
+        else
+            tx_start <= '0';
+        end if;
+    end if;
+end process;
+	    end Behavioral;
+Also, ensure that tx_start is asserted for a sufficient duration to be recognized by the uart_tx_1 component. You may need to add a state machine to control tx_start more precisely.
+
+If the FIFO data_o signal is always showing x"45", check the following:
+
+Verify that the FIFO is receiving the correct data on its data_i input.
+Ensure that rx_donetick1 and debounced_out are asserted correctly to write to and read from the FIFO.
+Finally, make sure all signals and components are correctly instantiated and connected.
+
+You may want to simulate your design to observe the behavior of signals and ensure everything works as expected. This can help you identify where the issue lies.
