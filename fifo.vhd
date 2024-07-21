@@ -49,7 +49,7 @@ architecture Behavioral of fifo is
     signal wr_pointer : integer range 0 to fifo_dpth -1 :=0;
     signal rd_pointer : integer range 0 to fifo_dpth -1 :=0;
     signal fifo_count : integer range 0 to fifo_dpth  :=0;
-    signal fifo_mem : fifo_array := (others =>(others=>'0'));
+    signal fifo_mem : fifo_array;-- := (others =>(others=>'0'));?
 begin
     process(clk,rst)
     begin
