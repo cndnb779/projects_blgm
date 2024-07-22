@@ -50,9 +50,9 @@ elsif rising_edge(clk) then
     if enable ='1' then
         shift_reg<=p_in;
     else
-        shift_reg <= shift_reg(6 downto 0) & '0';    
+        shift_reg <= '0' & shift_reg(7 downto 1) ;    
     end if;
 end if;
 end process;
-serial_out<= shift_reg(7);       
+serial_out<= shift_reg(0);       
 end Behavioral;
