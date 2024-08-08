@@ -2,9 +2,9 @@
 -- Company: 
 -- Engineer: 
 -- 
--- Create Date: 24.07.2024 09:16:22
+-- Create Date: 01.08.2024 09:16:14
 -- Design Name: 
--- Module Name: vga_driver - Behavioral
+-- Module Name: vga_controller_with_coordinates - Behavioral
 -- Project Name: 
 -- Target Devices: 
 -- Tool Versions: 
@@ -21,7 +21,21 @@
 
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
-use IEEE.std_logic_unsigned.ALL;
+
+-- Uncomment the following library declaration if using
+-- arithmetic functions with Signed or Unsigned values
+use IEEE.NUMERIC_STD.ALL;
+
+-- Uncomment the following library declaration if instantiating
+-- any Xilinx leaf cells in this code.
+--library UNISIM;
+--use UNISIM.VComponents.all;
+
+
+
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+--use IEEE.std_logic_unsigned.ALL;
 -- Uncomment the following library declaration if using
 -- arithmetic functions with Signed or Unsigned values
 use IEEE.NUMERIC_STD.ALL;
@@ -36,11 +50,17 @@ entity vga_driver is
         h_sync: out std_logic;
         clk_in_100: in std_logic;
         v_sync: out std_logic;
-        red : out std_logic_vector(3 downto 0);
-        green: out std_logic_vector(3 downto 0);
-        blue : out std_logic_vector(3 downto 0)
-         );
+        x_coor: out integer range 0 to 1920-1;
+        y_coor : out integer range 0 to 1080-1;
+        active: out std_logic;
+--        red: out std_logic_vector(3 downto 0);
+--        green: out std_logic_vector(3 downto 0);
+--        blue: out std_logic_vector(3 downto 0);
+        row_pixel: out std_logic_vector(12 downto 0);
+        column_pixel: out std_logic_vector(11 downto 0));
+     
 end vga_driver;
+
 
 architecture Behavioral of vga_driver is
 constant h_front_porch: integer:=88;
@@ -50,11 +70,11 @@ constant h_syncpulse: integer:=44;
 
 constant v_front_porch: integer:=4;
 constant v_back_porch: integer:=36;
-constant v_syncpulse: integer:=5;
+constant v_syncpulse: integer:=5;--5
 constant vva: integer:=1080;--??
 constant horiz_line:integer:= hva+h_back_porch+h_front_porch+h_syncpulse;--800
 constant ver_line: integer :=vva+v_back_porch+v_front_porch+ v_syncpulse;--
-signal clk_o :std_logic:='0';
+
 
 --component frequency_divider_100to25 is
 --    Port ( clk_in : in STD_LOGIC;
@@ -72,18 +92,19 @@ signal v_sync_temp : std_logic:='0';
 signal locked : std_logic:='0';
 signal h_count: integer range 0 to hva+h_back_porch+h_front_porch+h_syncpulse:=0;
 signal v_count: integer range 0 to vva+v_back_porch+v_front_porch+ v_syncpulse:=0;
-begin
-u3: clk_wiz_0  port map(clk_out1=>clk_o,reset=> reset,locked => locked, clk_in1=> clk_in_100);
---u1:frequency_divider_100to25 port map(clk_in=>clk_in_100,divided_clk_out=> clk_25, reset=> reset);
---u2: color_generator_8bitcounter port map(clk=> clk_in_100,rst=> reset,enable => clk_25,red_o => red,green_o => green, blue_o => blue );
 
-process(clk_o,reset)
+
+signal active_temp : std_logic;
+begin
+
+
+process(clk_in_100,reset)
 
 begin
 if reset='1' then
     h_count<=0;
     v_count<=0;
-elsif rising_edge(clk_o) then
+elsif rising_edge(clk_in_100) then
      if (h_count < h_syncpulse )then --95  en son(rising edge yüzünden bir sonraki rising edgei beklediðinden 94te deðil de 95te else'e geçer)
         h_sync_temp<='0';
      elsif(h_count<=hva+ h_back_porch + h_front_porch-1) then
@@ -106,12 +127,49 @@ elsif rising_edge(clk_o) then
       end if;       
 end if;                
 end process;
+
+
+process(h_count, v_count)
+begin
+if h_count>= (h_syncpulse +h_back_porch) and (h_count< h_syncpulse+ hva+ h_front_porch + h_back_porch) and (v_count>=(v_syncpulse+ v_back_porch))
+                              and (v_count< v_syncpulse+ vva+ v_back_porch) then
+   active_temp<='1';
+else
+    active_temp<='0';   
+end if;
+end process;
+
+
+
+x_coor<=h_count;
+y_coor<=v_count;
 h_sync<= h_sync_temp;
 v_sync<= v_sync_temp;
-red<="1110" when h_count>= (h_syncpulse +h_back_porch) and (h_count< h_syncpulse+ hva+ h_front_porch + h_back_porch) and (v_count>=(v_syncpulse+ v_back_porch))
-                              and (v_count< v_syncpulse+ vva+ v_back_porch) else "0000"; --just in the active area --vva hva
-green<="0000";
-blue<="1110"when h_count>= (h_syncpulse +h_back_porch) and (h_count< h_syncpulse+ hva+ h_front_porch+ h_back_porch) and (v_count>=(v_syncpulse+ v_back_porch))
-                              and (v_count< v_syncpulse + v_back_porch+ vva) else "0000";
+active<=active_temp;
+row_pixel<= std_logic_vector(to_unsigned(h_count,13));
+column_pixel<= std_logic_vector(to_unsigned(v_count,12)) ;
+
+
+
+
+--process(h_count,v_count,active_temp)
+--begin
+--if (active_temp='1') then
+--    if ((h_count))< ((hva/2)) then
+--        red<="1100";
+--        green<="0000";
+--        blue<="0110";
+--    else
+--        red<="0000";
+--        green<="0000";
+--        blue<="1111";
+--    end if;
+--else
+--    red<="0000";
+--    green<="0000";
+--    blue<="0000";        
+--end if;        
+
+--end process;
 
 end Behavioral;
